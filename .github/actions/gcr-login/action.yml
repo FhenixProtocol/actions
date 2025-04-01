@@ -1,0 +1,30 @@
+name: GCR Login.
+description: "Login to GCR"
+inputs:
+  registry:
+    required: true
+    type: string
+  service_account_key:
+    required: true
+    type: string
+
+
+runs:
+  using: "composite"
+  steps:
+    - id: 'auth'
+      uses: 'google-github-actions/auth@v2'
+      with:
+        credentials_json: '${{ inputs.service_account_key }}'
+
+    - name: 'Set up Cloud SDK'
+      uses: 'google-github-actions/setup-gcloud@v2'
+
+    - name: 'Use gcloud CLI'
+      shell: bash
+      run: 'gcloud info'
+
+    - name: Configure Docker to use the GCP project
+      shell: bash
+      run: |
+        gcloud auth configure-docker --quiet ${{ inputs.registry }}
