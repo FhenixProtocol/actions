@@ -70,10 +70,6 @@ jobs:
         uses: docker/metadata-action@v5
         with:
           images: ${{ inputs.registry }}/${{ inputs.image_name }}
-          tags: |
-            type=ref,event=tag
-            type=semver,pattern={{version}}
-            type=semver,pattern={{major}}.{{minor}}
 
       - name: Build and push  ${{ inputs.image_name }} Docker image.
         id: build
@@ -82,8 +78,7 @@ jobs:
           context: .
           platforms: ${{ matrix.platform }}
           file: ${{ inputs.dockerfile }}
-          push: true
-          tags: ${{ steps.meta.outputs.tags }}
+          tags: ${{ inputs.registry }}/${{ inputs.image_name }}
           labels: ${{ steps.meta.outputs.labels }}
           outputs: type=image,push-by-digest=true,name-canonical=true,push=true
 
@@ -106,12 +101,11 @@ jobs:
     needs:
       - build
     steps:
-      - name: Download digests
-        uses: actions/download-artifact@v4
-        with:
-          path: ${{ runner.temp }}/digests
-          pattern: digests-*
-          merge-multiple: true
+      - name: Checkout repository
+        uses: actions/checkout@v4
+  
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
 
       - name: Log in to github container registry.
         if: ${{ inputs.registry == 'ghcr.io' }}
@@ -120,33 +114,50 @@ jobs:
           registry: ${{ inputs.registry }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-
+          
       - name: Log in to ${{ inputs.registry }} container registry.
         if: contains(inputs.registry, 'pkg.dev')
         uses: FhenixProtocol/actions/.github/actions/gcr-login@master
         with:
           service_account_key: ${{ secrets.GCR_SERVICE_ACCOUNT_KEY }}
           registry: ${{ inputs.registry }}
-    
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
+          
+      - name: Download digests
+        uses: actions/download-artifact@v4
+        with:
+          path: ${{ runner.temp }}/digests
+          pattern: digests-*
+          merge-multiple: true
 
+      - name: Set tag based on trigger
+        id: set-tag
+        run: |
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            echo "TAG=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+          elif [[ "${{ github.ref }}" == refs/tags/v* ]]; then
+            echo "TAG=${{ github.ref_name }}" >> $GITHUB_OUTPUT
+          elif [[ "${{ github.ref }}" == refs/tags/publish/* ]]; then
+            TAG="${{ github.ref_name }}"
+            echo "TAG=${TAG#publish/}" >> $GITHUB_OUTPUT
+          else
+            echo "TAG=latest" >> $GITHUB_OUTPUT
+          fi
+    
       - name: Docker meta
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: ${{ inputs.image_name }}
+          images: ${{ inputs.registry }}/${{ inputs.image_name }}
           tags: |
-            type=ref,event=tag
-            type=semver,pattern={{version}}
-            type=semver,pattern={{major}}.{{minor}}
+            type=raw,value=${{ steps.set-tag.outputs.TAG }}
+            type=raw,value=latest,enable=${{ startsWith(github.ref, 'refs/tags/v') }}
 
       - name: Create manifest list and push
         working-directory: ${{ runner.temp }}/digests
         run: |
           docker buildx imagetools create $(jq -cr '.tags | map("-t " + .) | join(" ")' <<< "$DOCKER_METADATA_OUTPUT_JSON") \
-            $(printf '${{ inputs.image_name }}@sha256:%s ' *)
+            $(printf '${{ inputs.registry }}/${{ inputs.image_name }}@sha256:%s ' *)
 
       - name: Inspect image
         run: |
-          docker buildx imagetools inspect ${{ inputs.image_name }}:${{ steps.meta.outputs.version }}
+          docker buildx imagetools inspect ${{ inputs.registry }}/${{ inputs.image_name }}:${{ steps.meta.outputs.version }}
