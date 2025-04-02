@@ -32,7 +32,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        platform: ${{ fromJSON(github.event.inputs.platforms) }}
+        platform: ${{ fromJSON(inputs.platforms) }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
