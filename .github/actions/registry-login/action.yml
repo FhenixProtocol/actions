@@ -3,28 +3,34 @@ description: "Login to GCR"
 inputs:
   registry:
     required: true
-    type: string
+    description: "The container registry to login to"
   service_account_key:
     required: true
-    type: string
-
-
+    description: "The service account key for the container registry"
 runs:
   using: "composite"
   steps:
+    - name: Log in to github container registry.
+      if: ${{ inputs.registry == 'ghcr.io' }}
+      uses: docker/login-action@v3
+      with:
+        registry: ${{ inputs.registry }}
+        username: ${{ github.actor }}
+        password: ${{ github.token }}
     - id: 'auth'
+      if: contains(inputs.registry, 'pkg.dev')
       uses: 'google-github-actions/auth@v2'
       with:
         credentials_json: '${{ inputs.service_account_key }}'
-
     - name: 'Set up Cloud SDK'
+      if: contains(inputs.registry, 'pkg.dev')
       uses: 'google-github-actions/setup-gcloud@v2'
-
     - name: 'Use gcloud CLI'
+      if: contains(inputs.registry, 'pkg.dev')
       shell: bash
       run: 'gcloud info'
-
     - name: Configure Docker to use the GCP project
+      if: contains(inputs.registry, 'pkg.dev')
       shell: bash
       run: |
         gcloud auth configure-docker --quiet ${{ inputs.registry }}
