@@ -35,6 +35,8 @@ on:
         required: false
       git_submodule_token:
         required: false
+      docker_registry_token:
+        required: false
 
 jobs:
   build:
@@ -62,6 +64,7 @@ jobs:
         with:
           service_account_key: ${{ secrets.service_account_key }}
           registry: ${{ inputs.registry }}
+          docker_registry_token: ${{ secrets.docker_registry_token }}
       - name: Extract metadata (tags, labels) Docker image.
         id: meta
         uses: docker/metadata-action@v5
@@ -101,4 +104,5 @@ jobs:
           registry: ${{ inputs.registry }}
           image_name: "${{ inputs.image_name }}"
           service_account_key: ${{ secrets.service_account_key }}
+          docker_registry_token: ${{ secrets.docker_registry_token }}
           runs_on: ${{ inputs.runs_on }}

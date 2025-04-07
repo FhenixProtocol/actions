@@ -10,6 +10,9 @@ inputs:
   service_account_key:
     required: false
     description: "The service account key for the container registry"
+  docker_registry_token:
+    required: false
+    description: "The token for the container registry"
   runs_on:
     required: true
     description: "The platform to run on"
@@ -26,6 +29,7 @@ runs:
       with:
         service_account_key: ${{ inputs.service_account_key }}
         registry: ${{ inputs.registry }}
+        docker_registry_token: ${{ inputs.docker_registry_token }}
     - name: Download digests
       uses: actions/download-artifact@v4
       with:
