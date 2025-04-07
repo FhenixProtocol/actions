@@ -1,0 +1,69 @@
+name: push digests.
+description: "push digests"
+inputs:
+  registry:
+    required: true
+    description: "The container registry to push the digests to"
+  image_name:
+    required: true
+    description: "The name of the image to push the digests to"
+  service_account_key:
+    required: false
+    description: "The service account key for the container registry"
+  docker_registry_token:
+    required: false
+    description: "The token for the container registry"
+  runs_on:
+    required: true
+    description: "The platform to run on"
+runs:
+  using: 'composite'
+  steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+    - name: Log in to container registry.
+      if: ${{ inputs.registry == 'ghcr.io' }}
+      uses: FhenixProtocol/actions/.github/actions/registry-login@master
+      with:
+        service_account_key: ${{ inputs.service_account_key }}
+        registry: ${{ inputs.registry }}
+        docker_registry_token: ${{ inputs.docker_registry_token }}
+    - name: Download digests
+      uses: actions/download-artifact@v4
+      with:
+        path: ${{ runner.temp }}/digests
+        pattern: digests-*-${{ inputs.runs_on }}
+        merge-multiple: true
+    - name: Set tag based on trigger
+      id: set-tag
+      shell: bash
+      run: |
+        if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+          echo "TAG=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+        elif [[ "${{ github.ref }}" == refs/tags/v* ]]; then
+          echo "TAG=${{ github.ref_name }}" >> $GITHUB_OUTPUT
+        elif [[ "${{ github.ref }}" == refs/tags/publish/* ]]; then
+          TAG="${{ github.ref_name }}"
+          echo "TAG=${TAG#publish/}" >> $GITHUB_OUTPUT
+        fi
+    - name: Docker meta
+      id: meta
+      uses: docker/metadata-action@v5
+      with:
+        images: ${{ inputs.registry }}/${{ inputs.image_name }}
+        tags: |
+          type=raw,value=${{ steps.set-tag.outputs.TAG }}
+          type=sha
+          type=raw,value=latest,enable=${{ startsWith(github.ref, 'refs/tags/v') }}
+    - name: Create manifest list and push
+      working-directory: ${{ runner.temp }}/digests
+      shell: bash
+      run: |
+        docker buildx imagetools create $(jq -cr '.tags | map("-t " + .) | join(" ")' <<< "$DOCKER_METADATA_OUTPUT_JSON") \
+          $(printf '${{ inputs.registry }}/${{ inputs.image_name }}@sha256:%s ' *)
+    - name: Inspect image
+      shell: bash
+      run: |
+        docker buildx imagetools inspect ${{ inputs.registry }}/${{ inputs.image_name }}:${{ steps.meta.outputs.version }}
