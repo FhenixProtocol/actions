@@ -16,6 +16,9 @@ inputs:
   runs_on:
     required: true
     description: "The platform to run on"
+  id:
+    required: false
+    description: "The id of the image to push the digests to"
 runs:
   using: 'composite'
   steps:
@@ -34,7 +37,7 @@ runs:
       uses: actions/download-artifact@v4
       with:
         path: ${{ runner.temp }}/digests
-        pattern: digests-*-${{ inputs.runs_on }}
+        pattern: digests-*-${{ inputs.runs_on }}-${{ inputs.id }}
         merge-multiple: true
     - name: Set tag based on trigger
       id: set-tag
