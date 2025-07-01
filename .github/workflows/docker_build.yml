@@ -34,6 +34,10 @@ on:
         required: false
         type: string
         default: ''
+      context:
+        required: false
+        type: string
+        default: .
     secrets:
       service_account_key:
         required: false
@@ -78,7 +82,7 @@ jobs:
         id: build
         uses: docker/build-push-action@v5
         with:
-          context: .
+          context: ${{ inputs.context }}
           platforms: ${{ matrix.platform }}
           file: ${{ inputs.dockerfile }}
           tags: ${{ inputs.registry }}/${{ inputs.image_name }}
