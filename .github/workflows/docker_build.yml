@@ -21,11 +21,10 @@ on:
       platforms:
         required: false
         type: string
-        default: '["linux/amd64", "linux/arm64"]'
       runs_on:
         required: false
         type: string
-        default: ubuntu-latest
+        default: '["ubuntu-latest", "ubuntu-latest-arm64"]'
       build_args:
         required: false
         type: string
@@ -52,10 +51,10 @@ on:
 
 jobs:
   build:
-    runs-on: ${{ inputs.runs_on }}
     strategy:
       matrix:
-        platform: ${{ fromJSON(inputs.platforms) }}
+        runs_on: ${{ fromJSON(inputs.runs_on) }}
+    runs-on: ${{ matrix.runs_on }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -87,7 +86,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: ${{ inputs.context }}
-          platforms: ${{ matrix.platform }}
+          platforms: ${{ inputs.runs_on }}
           file: ${{ inputs.dockerfile }}
           tags: ${{ inputs.registry }}/${{ inputs.image_name }}
           labels: ${{ steps.meta.outputs.labels }}
@@ -103,7 +102,7 @@ jobs:
       - name: Upload digest
         uses: actions/upload-artifact@v4
         with:
-          name: digests-${{ env.PLATFORM_PAIR }}-${{ inputs.runs_on }}-${{ inputs.id }}
+          name: digests-${{ matrix.runs_on }}-${{ inputs.id }}-${{ github.job }}
           path: ${{ runner.temp }}/digests/*
           if-no-files-found: error
           retention-days: 1
@@ -119,6 +118,6 @@ jobs:
           image_name: "${{ inputs.image_name }}"
           service_account_key: ${{ secrets.service_account_key }}
           docker_registry_token: ${{ secrets.docker_registry_token }}
-          runs_on: ${{ inputs.runs_on }}
+          runs_on: "ubuntu-latest"
           id: ${{ inputs.id }}
           tag: ${{ inputs.tag }}

@@ -30,6 +30,7 @@ runs:
       uses: actions/checkout@v4
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v3
+
     - name: Log in to container registry.
       if: ${{ inputs.registry == 'ghcr.io' }}
       uses: FhenixProtocol/actions/.github/actions/registry-login@v1.0.5
@@ -37,12 +38,14 @@ runs:
         service_account_key: ${{ inputs.service_account_key }}
         registry: ${{ inputs.registry }}
         docker_registry_token: ${{ inputs.docker_registry_token }}
+
     - name: Download digests
       uses: actions/download-artifact@v4
       with:
         path: ${{ runner.temp }}/digests
-        pattern: digests-*-${{ inputs.runs_on }}-${{ inputs.id }}
+        pattern: digests-*-${{ inputs.id }}-${{ github.job }}
         merge-multiple: true
+
     - name: Set tag based on trigger
       id: set-tag
       shell: bash
@@ -66,6 +69,7 @@ runs:
           type=raw,value=${{ steps.set-tag.outputs.TAG }}
           type=sha
           type=raw,value=latest,enable=${{ startsWith(github.ref, 'refs/tags/') }}
+
     - name: Create manifest list and push
       working-directory: ${{ runner.temp }}/digests
       shell: bash
