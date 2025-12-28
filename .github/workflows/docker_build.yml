@@ -37,10 +37,18 @@ on:
         required: false
         type: string
         default: ''
-      runners_mapping:
+      # runners_mapping:
+      #   required: false
+      #   type: string
+      #   default: '{"linux/amd64": "ubuntu-24.04", "linux/arm64": "ubuntu-24.04-arm"}'
+      arm_runner:
         required: false
         type: string
-        default: '{"linux/amd64": "ubuntu-24.04", "linux/arm64": "ubuntu-24.04-arm"}'
+        default: 'ubuntu-24.04-arm'
+      amd64_runner:
+        required: false
+        type: string
+        default: 'ubuntu-24.04'
     secrets:
       service_account_key:
         required: false
@@ -55,9 +63,9 @@ jobs:
       matrix:
         include:
         - platform: linux/amd64
-          runner: fromJSON(${{ inputs.runners_mapping }})["linux/amd64"]
+          runner: ${{ inputs.amd64_runner }}
         - platform: linux/arm64
-          runner: fromJSON(${{ inputs.runners_mapping }})["linux/amd64"]
+          runner: ${{ inputs.arm_runner }}
 
     runs-on: ${{ matrix.runner }}
     steps:
