@@ -37,10 +37,6 @@ on:
         required: false
         type: string
         default: ''
-      # runners_mapping:
-      #   required: false
-      #   type: string
-      #   default: '{"linux/amd64": "ubuntu-24.04", "linux/arm64": "ubuntu-24.04-arm"}'
       arm_runner:
         required: false
         type: string
