@@ -24,7 +24,7 @@ on:
       runs_on:
         required: false
         type: string
-        default: '["ubuntu-24.04", "ubuntu-24.04-arm"]'
+        default: "[{\"platforms\": \"linux/amd64\", \"runner\": \"ubuntu-24.04\"}, {\"platforms\": \"linux/arm64\", \"runner\": \"ubuntu-24.04-arm\"}]"
       build_args:
         required: false
         type: string
@@ -52,12 +52,7 @@ on:
 jobs:
   build:
     strategy:
-      matrix:
-        include:
-        - platform: linux/amd64
-          runner: ubuntu-24.04
-        - platform: linux/arm64
-          runner: ubuntu-24.04-arm
+      matrix: ${{ fromJSON(inputs.runs_on) }}
 
     runs-on: ${{ matrix.runner }}
     steps:
