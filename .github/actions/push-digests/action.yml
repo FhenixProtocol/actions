@@ -35,7 +35,7 @@ runs:
 
     - name: Log in to container registry.
       if: ${{ inputs.registry == 'ghcr.io' }}
-      uses: FhenixProtocol/actions/.github/actions/registry-login@v1.0.5
+      uses: ./.github/actions/registry-login/action.yml
       with:
         service_account_key: ${{ inputs.service_account_key }}
         registry: ${{ inputs.registry }}
