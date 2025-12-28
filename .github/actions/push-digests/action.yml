@@ -19,10 +19,12 @@ inputs:
   id:
     required: false
     description: "The id of the image to push the digests to"
+    default: "0"
   tag:
     required: false
     description: "The tag of the image to push the digests to"
     default: ""
+
 runs:
   using: 'composite'
   steps:
@@ -33,7 +35,7 @@ runs:
 
     - name: Log in to container registry.
       if: ${{ inputs.registry == 'ghcr.io' }}
-      uses: FhenixProtocol/actions/.github/actions/registry-login@v1.0.5
+      uses: FhenixProtocol/actions/.github/actions/registry-login@alon.dotan/feature/support_builders
       with:
         service_account_key: ${{ inputs.service_account_key }}
         registry: ${{ inputs.registry }}
@@ -43,7 +45,7 @@ runs:
       uses: actions/download-artifact@v4
       with:
         path: ${{ runner.temp }}/digests
-        pattern: digests-*-${{ inputs.id }}-${{ github.job }}
+        pattern: digests*${{ inputs.id }}*${{ github.run_id }}
         merge-multiple: true
 
     - name: Set tag based on trigger
