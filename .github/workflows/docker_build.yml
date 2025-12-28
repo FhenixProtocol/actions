@@ -21,10 +21,6 @@ on:
       platforms:
         required: false
         type: string
-      runs_on:
-        required: false
-        type: string
-        default: "[{\"platforms\": \"linux/amd64\", \"runner\": \"ubuntu-24.04\"}, {\"platforms\": \"linux/arm64\", \"runner\": \"ubuntu-24.04-arm\"}]"
       build_args:
         required: false
         type: string
@@ -41,6 +37,10 @@ on:
         required: false
         type: string
         default: ''
+      runners_mapping:
+        required: false
+        type: string
+        default: '{"linux/amd64": "ubuntu-24.04", "linux/arm64": "ubuntu-24.04-arm"}'
     secrets:
       service_account_key:
         required: false
@@ -52,7 +52,12 @@ on:
 jobs:
   build:
     strategy:
-      matrix: ${{ fromJSON(inputs.runs_on) }}
+      matrix:
+        include:
+        - platform: linux/amd64
+          runner: fromJSON(${{ inputs.runners_mapping }})["linux/amd64"]
+        - platform: linux/arm64
+          runner: fromJSON(${{ inputs.runners_mapping }})["linux/amd64"]
 
     runs-on: ${{ matrix.runner }}
     steps:
