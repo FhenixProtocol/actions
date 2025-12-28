@@ -86,7 +86,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: ${{ inputs.context }}
-          platforms: ${{ inputs.runs_on }}
+          platforms: ${{ inputs.platforms }}
           file: ${{ inputs.dockerfile }}
           tags: ${{ inputs.registry }}/${{ inputs.image_name }}
           labels: ${{ steps.meta.outputs.labels }}
