@@ -24,7 +24,7 @@ on:
       runs_on:
         required: false
         type: string
-        default: '["ubuntu-latest", "ubuntu-latest-arm64"]'
+        default: '["ubuntu-24.04", "ubuntu-24.04-arm"]'
       build_args:
         required: false
         type: string
