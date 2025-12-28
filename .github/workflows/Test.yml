@@ -9,19 +9,11 @@ on:
 
 jobs:
   build-and-push:
-    runs-on: ubuntu-latest
     permissions:
         contents: read
         packages: write
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          submodules: recursive
-          token: ${{ secrets.git_submodule_token || github.token }}
-      - name: Build
-        uses: ./.github/workflows/docker_build.yml
-        with:
-            registry: 'ghcr.io'
-            image_name: 'fhenixprotocol/actions/ubuntu'
-            id: 'ubuntu'
+    uses: FhenixProtocol/actions/.github/workflows/docker_build.yml@alon.dotan/feature/support_builders
+    with:
+        registry: 'ghcr.io'
+        image_name: 'fhenixprotocol/actions/ubuntu'
+        id: 'ubuntu'

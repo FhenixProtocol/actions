@@ -76,7 +76,7 @@ jobs:
         uses: docker/setup-buildx-action@v3
       - name: Log in to container registry.
         if: ${{ inputs.registry == 'ghcr.io' }}
-        uses: ./.github/actions/registry-login/action.yml
+        uses: FhenixProtocol/actions/.github/actions/registry-login@alon.dotan/feature/support_builders
         with:
           service_account_key: ${{ secrets.service_account_key }}
           registry: ${{ inputs.registry }}
@@ -107,7 +107,7 @@ jobs:
       - name: Upload digest
         uses: actions/upload-artifact@v4
         with:
-          name: digests-${{ env.PLATFORM_PAIR }}
+          name: digests-${{ env.PLATFORM_PAIR }}-${{ inputs.id }}-${{ github.run_id }}
           path: ${{ runner.temp }}/digests/*
           if-no-files-found: error
           retention-days: 1
@@ -118,7 +118,7 @@ jobs:
       - build
     steps:
       - name: Push digests
-        uses: ./.github/actions/push-digests/action.yml
+        uses: FhenixProtocol/actions/.github/actions/push-digests@alon.dotan/feature/support_builders
         with:
           registry: ${{ inputs.registry }}
           image_name: "${{ inputs.image_name }}"

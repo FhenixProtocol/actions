@@ -35,7 +35,7 @@ runs:
 
     - name: Log in to container registry.
       if: ${{ inputs.registry == 'ghcr.io' }}
-      uses: ./.github/actions/registry-login/action.yml
+      uses: FhenixProtocol/actions/.github/actions/registry-login@alon.dotan/feature/support_builders
       with:
         service_account_key: ${{ inputs.service_account_key }}
         registry: ${{ inputs.registry }}
@@ -45,7 +45,7 @@ runs:
       uses: actions/download-artifact@v4
       with:
         path: ${{ runner.temp }}/digests
-        pattern: digests-*${{ inputs.id }}*
+        pattern: digests*${{ inputs.id }}*${{ github.run_id }}
         merge-multiple: true
 
     - name: Set tag based on trigger
