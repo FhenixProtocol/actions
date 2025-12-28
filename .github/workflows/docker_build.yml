@@ -76,7 +76,7 @@ jobs:
         uses: docker/setup-buildx-action@v3
       - name: Log in to container registry.
         if: ${{ inputs.registry == 'ghcr.io' }}
-        uses: FhenixProtocol/actions/.github/actions/registry-login@v1.0.5
+        uses: ./.github/actions/registry-login/action.yml
         with:
           service_account_key: ${{ secrets.service_account_key }}
           registry: ${{ inputs.registry }}
@@ -118,12 +118,12 @@ jobs:
       - build
     steps:
       - name: Push digests
-        uses: FhenixProtocol/actions/.github/actions/push-digests@v1.0.5
+        uses: ./.github/actions/push-digests/action.yml
         with:
           registry: ${{ inputs.registry }}
           image_name: "${{ inputs.image_name }}"
           service_account_key: ${{ secrets.service_account_key }}
           docker_registry_token: ${{ secrets.docker_registry_token }}
           runs_on: "ubuntu-latest"
-          id: ${{ inputs.id }}-${{ github.run_id }}
+          id: ${{ inputs.id }}
           tag: ${{ inputs.tag }}
