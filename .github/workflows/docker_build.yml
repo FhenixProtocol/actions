@@ -32,7 +32,7 @@ on:
       id:
         required: false
         type: string
-        default: ''
+        default: '0'
       context:
         required: false
         type: string
@@ -102,7 +102,7 @@ jobs:
       - name: Upload digest
         uses: actions/upload-artifact@v4
         with:
-          name: digests-${{ matrix.runs_on }}-${{ inputs.id }}-${{ github.job }}
+          name: digests-${{ matrix.runs_on }}-${{ inputs.id }}-${{ github.run_id }}
           path: ${{ runner.temp }}/digests/*
           if-no-files-found: error
           retention-days: 1
