@@ -5,15 +5,15 @@ on:
 
   pull_request:
     paths:
-    - '.github/**'
+      - ".github/**"
 
 jobs:
   build-and-push:
     permissions:
-        contents: read
-        packages: write
-    uses: FhenixProtocol/actions/.github/workflows/docker_build.yml@alon.dotan/feature/support_builders
+      contents: read
+      packages: write
+    uses: FhenixProtocol/actions/.github/workflows/docker_build.yml@2.0.0
     with:
-        registry: 'ghcr.io'
-        image_name: 'fhenixprotocol/actions/ubuntu'
-        id: 'ubuntu'
+      registry: "ghcr.io"
+      image_name: "fhenixprotocol/actions/ubuntu"
+      id: "ubuntu"
