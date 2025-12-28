@@ -119,5 +119,5 @@ jobs:
           service_account_key: ${{ secrets.service_account_key }}
           docker_registry_token: ${{ secrets.docker_registry_token }}
           runs_on: "ubuntu-latest"
-          id: ${{ inputs.id }}
+          id: ${{ inputs.id }}-${{ github.run_id }}
           tag: ${{ inputs.tag }}

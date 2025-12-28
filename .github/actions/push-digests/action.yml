@@ -24,6 +24,7 @@ inputs:
     required: false
     description: "The tag of the image to push the digests to"
     default: ""
+
 runs:
   using: 'composite'
   steps:
@@ -44,7 +45,7 @@ runs:
       uses: actions/download-artifact@v4
       with:
         path: ${{ runner.temp }}/digests
-        pattern: digests-*${{ inputs.id }}-${{ github.run_id }}
+        pattern: digests-*${{ inputs.id }}
         merge-multiple: true
 
     - name: Set tag based on trigger
