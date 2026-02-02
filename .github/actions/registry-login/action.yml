@@ -14,24 +14,28 @@ runs:
   using: "composite"
   steps:
     - name: Log in to github container registry.
-      if: ${{ inputs.registry == 'ghcr.io' }}
+      if: contains(inputs.registry, 'ghcr.io')
       uses: docker/login-action@v3
       with:
         registry: ${{ inputs.registry }}
         username: ${{ github.actor }}
         password: ${{ inputs.docker_registry_token || github.token }}
+
     - id: 'auth'
       if: contains(inputs.registry, 'pkg.dev')
       uses: 'google-github-actions/auth@v2'
       with:
         credentials_json: '${{ inputs.service_account_key }}'
+
     - name: 'Set up Cloud SDK'
       if: contains(inputs.registry, 'pkg.dev')
       uses: 'google-github-actions/setup-gcloud@v2'
+
     - name: 'Use gcloud CLI'
       if: contains(inputs.registry, 'pkg.dev')
       shell: bash
       run: 'gcloud info'
+
     - name: Configure Docker to use the GCP project
       if: contains(inputs.registry, 'pkg.dev')
       shell: bash

@@ -12,7 +12,7 @@ jobs:
     permissions:
       contents: read
       packages: write
-    uses: FhenixProtocol/actions/.github/workflows/docker_build.yml@2.0.0
+    uses: FhenixProtocol/actions/.github/workflows/docker_build.yml@2.x.x
     with:
       registry: "ghcr.io"
       image_name: "fhenixprotocol/actions/ubuntu"
