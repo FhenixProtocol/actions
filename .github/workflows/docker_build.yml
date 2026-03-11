@@ -52,6 +52,10 @@ on:
         required: false
       docker_registry_token:
         required: false
+      dockerhub_username:
+        required: false
+      dockerhub_token:
+        required: false
 
 jobs:
   build:
@@ -88,6 +92,13 @@ jobs:
           service_account_key: ${{ secrets.service_account_key }}
           registry: ${{ inputs.registry }}
           docker_registry_token: ${{ secrets.docker_registry_token }}
+
+      - name: Log in to Docker Hub
+        if: ${{ secrets.dockerhub_username != '' && secrets.dockerhub_token != '' }}
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.dockerhub_username }}
+          password: ${{ secrets.dockerhub_token }}
 
       - name: Extract metadata (tags, labels) Docker image.
         id: meta
@@ -128,6 +139,13 @@ jobs:
     needs:
       - build
     steps:
+      - name: Log in to Docker Hub
+        if: ${{ secrets.dockerhub_username != '' && secrets.dockerhub_token != '' }}
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.dockerhub_username }}
+          password: ${{ secrets.dockerhub_token }}
+
       - name: Push digests
         uses: FhenixProtocol/actions/.github/actions/push-digests@2.x.x
         with:
