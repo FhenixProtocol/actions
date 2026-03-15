@@ -94,8 +94,10 @@ jobs:
           docker_registry_token: ${{ secrets.docker_registry_token }}
 
       - name: Log in to Docker Hub
-        if: ${{ secrets.dockerhub_username != '' && secrets.dockerhub_token != '' }}
+        if: env.DOCKERHUB_USERNAME != ''
         uses: docker/login-action@v3
+        env:
+          DOCKERHUB_USERNAME: ${{ secrets.dockerhub_username }}
         with:
           username: ${{ secrets.dockerhub_username }}
           password: ${{ secrets.dockerhub_token }}
