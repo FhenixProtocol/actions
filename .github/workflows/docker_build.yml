@@ -49,6 +49,14 @@ on:
         required: false
         type: string
         default: "ubuntu-24.04"
+      cache_from:
+        required: false
+        type: string
+        default: "type=gha"
+      cache_to:
+        required: false
+        type: string
+        default: "type=gha,mode=max"
     secrets:
       service_account_key:
         required: false
@@ -124,8 +132,8 @@ jobs:
           build-args: ${{ inputs.build_args }}
           build-contexts: ${{ inputs.build_contexts }}
           outputs: type=image,push-by-digest=true,name-canonical=true,push=true
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+          cache-from: ${{ inputs.cache_from }}
+          cache-to: ${{ inputs.cache_to }}
 
       - name: Export digest
         run: |
