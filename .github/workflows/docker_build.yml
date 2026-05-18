@@ -70,7 +70,7 @@ jobs:
             runner: ${{ inputs.amd64_runner }}
           - platform: linux/arm64
             runner: ${{ inputs.arm64_runner }}
-
+    name: Build and push ${{ inputs.image_name }} for ${{ matrix.platform }}
     runs-on: ${{ matrix.runner }}
     steps:
       - name: Checkout repository
