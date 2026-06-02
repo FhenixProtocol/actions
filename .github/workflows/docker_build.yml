@@ -132,8 +132,8 @@ jobs:
           build-args: ${{ inputs.build_args }}
           build-contexts: ${{ inputs.build_contexts }}
           outputs: type=image,push-by-digest=true,name-canonical=true,push=true
-          cache-from: ${{ inputs.cache_from }}
-          cache-to: ${{ inputs.cache_to }}
+          cache-from: ${{ inputs.cache_from }}-${{ matrix.runner }}
+          cache-to: ${{ inputs.cache_to }}-${{ matrix.runner }}
 
       - name: Export digest
         run: |
