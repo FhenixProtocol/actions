@@ -78,6 +78,7 @@ jobs:
             runner: ${{ inputs.amd64_runner }}
           - platform: linux/arm64
             runner: ${{ inputs.arm64_runner }}
+
     name: Build and push ${{ inputs.image_name }} for ${{ matrix.platform }}
     runs-on: ${{ matrix.runner }}
     steps:
@@ -86,6 +87,15 @@ jobs:
         with:
           submodules: recursive
           token: ${{ secrets.git_submodule_token || github.token }}
+
+      - name: Log in to Docker Hub
+        if: env.DOCKERHUB_USERNAME != ''
+        uses: docker/login-action@v4
+        env:
+          DOCKERHUB_USERNAME: ${{ secrets.dockerhub_username }}
+        with:
+          username: ${{ secrets.dockerhub_username }}
+          password: ${{ secrets.dockerhub_token }}
 
       - name: Prepare.
         run: |
@@ -104,15 +114,6 @@ jobs:
           service_account_key: ${{ secrets.service_account_key }}
           registry: ${{ inputs.registry }}
           docker_registry_token: ${{ secrets.docker_registry_token }}
-
-      - name: Log in to Docker Hub
-        if: env.DOCKERHUB_USERNAME != ''
-        uses: docker/login-action@v4
-        env:
-          DOCKERHUB_USERNAME: ${{ secrets.dockerhub_username }}
-        with:
-          username: ${{ secrets.dockerhub_username }}
-          password: ${{ secrets.dockerhub_token }}
 
       - name: Extract metadata (tags, labels) Docker image.
         id: meta
