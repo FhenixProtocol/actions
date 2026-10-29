@@ -49,14 +49,16 @@ on:
         required: false
         type: string
         default: "ubuntu-24.04"
+      # Must end in scope=<name> (or ref=<name> for a registry cache): the build step appends
+      # -<runner> to it, so each platform gets its own cache. Empty means a gha cache scoped by id.
       cache_from:
         required: false
         type: string
-        default: "type=gha"
+        default: ""
       cache_to:
         required: false
         type: string
-        default: "type=gha,mode=max"
+        default: ""
     secrets:
       service_account_key:
         required: false
@@ -133,8 +135,11 @@ jobs:
           build-args: ${{ inputs.build_args }}
           build-contexts: ${{ inputs.build_contexts }}
           outputs: type=image,push-by-digest=true,name-canonical=true,push=true
-          cache-from: ${{ inputs.cache_from }}-${{ matrix.runner }}
-          cache-to: ${{ inputs.cache_to }}-${{ matrix.runner }}
+          # A bare "type=gha" default made this "type=gha-<runner>" (an invalid importer) and left every
+          # image and platform on one shared scope, whose export failed with "failed to reserve cache".
+          # ignore-error: a cache write must never fail an image build.
+          cache-from: ${{ inputs.cache_from || format('type=gha,scope={0}', inputs.id) }}-${{ matrix.runner }}
+          cache-to: ${{ inputs.cache_to || format('type=gha,mode=max,scope={0}', inputs.id) }}-${{ matrix.runner }},ignore-error=true
 
       - name: Export digest
         run: |
