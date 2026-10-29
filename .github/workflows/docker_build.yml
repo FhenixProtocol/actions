@@ -135,8 +135,8 @@ jobs:
           build-args: ${{ inputs.build_args }}
           build-contexts: ${{ inputs.build_contexts }}
           outputs: type=image,push-by-digest=true,name-canonical=true,push=true
-          # A bare "type=gha" default made this "type=gha-<runner>" (an invalid importer) and left both
-          # platforms writing one scope, where their races failed builds with "failed to reserve cache".
+          # A bare "type=gha" default made this "type=gha-<runner>" (an invalid importer) and left every
+          # image and platform on one shared scope, whose export failed with "failed to reserve cache".
           # ignore-error: a cache write must never fail an image build.
           cache-from: ${{ inputs.cache_from || format('type=gha,scope={0}', inputs.id) }}-${{ matrix.runner }}
           cache-to: ${{ inputs.cache_to || format('type=gha,mode=max,scope={0}', inputs.id) }}-${{ matrix.runner }},ignore-error=true
