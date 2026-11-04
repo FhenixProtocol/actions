@@ -85,14 +85,14 @@ jobs:
     runs-on: ${{ matrix.runner }}
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
         with:
           submodules: recursive
           token: ${{ secrets.git_submodule_token || github.token }}
 
       - name: Log in to Docker Hub
         if: env.DOCKERHUB_USERNAME != ''
-        uses: docker/login-action@v4
+        uses: docker/login-action@81c6f93d4bc991e510b342a00b419b3bb4efc5c6 # v4.7.0
         env:
           DOCKERHUB_USERNAME: ${{ secrets.dockerhub_username }}
         with:
@@ -105,10 +105,10 @@ jobs:
           echo "PLATFORM_PAIR=${platform//\//-}" >> $GITHUB_ENV
 
       - name: Set up QEMU.
-        uses: docker/setup-qemu-action@v4
+        uses: docker/setup-qemu-action@99012661954931238ded8c8b007157a8430204e1 # v4.4.0
 
       - name: Set up Docker Buildx.
-        uses: docker/setup-buildx-action@v4
+        uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4.4.1
 
       - name: Log in to container registry.
         uses: FhenixProtocol/actions/.github/actions/registry-login@2.x.x
@@ -119,13 +119,13 @@ jobs:
 
       - name: Extract metadata (tags, labels) Docker image.
         id: meta
-        uses: docker/metadata-action@v6
+        uses: docker/metadata-action@dc802804100637a589fabce1cb79ff13a1411302 # v6.2.0
         with:
           images: ${{ inputs.registry }}/${{ inputs.image_name }}
 
       - name: Build and push  ${{ inputs.image_name }} Docker image.
         id: build
-        uses: docker/build-push-action@v7
+        uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7.4.0
         with:
           context: ${{ inputs.context }}
           platforms: ${{ inputs.platforms }}
@@ -148,7 +148,7 @@ jobs:
           touch "${{ runner.temp }}/digests/${digest#sha256:}"
 
       - name: Upload digest
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
         with:
           name: digests-${{ env.PLATFORM_PAIR }}-${{ inputs.id }}-${{ github.run_id }}
           path: ${{ runner.temp }}/digests/*
