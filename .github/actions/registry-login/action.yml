@@ -15,7 +15,7 @@ runs:
   steps:
     - name: Log in to github container registry.
       if: contains(inputs.registry, 'ghcr.io')
-      uses: docker/login-action@v4
+      uses: docker/login-action@81c6f93d4bc991e510b342a00b419b3bb4efc5c6 # v4.7.0
       with:
         registry: ${{ inputs.registry }}
         username: ${{ github.actor }}
@@ -23,13 +23,13 @@ runs:
 
     - id: 'auth'
       if: contains(inputs.registry, 'pkg.dev')
-      uses: 'google-github-actions/auth@v2'
+      uses: google-github-actions/auth@c200f3691d83b41bf9bbd8638997a462592937ed # v2.1.13
       with:
         credentials_json: '${{ inputs.service_account_key }}'
 
     - name: 'Set up Cloud SDK'
       if: contains(inputs.registry, 'pkg.dev')
-      uses: 'google-github-actions/setup-gcloud@v2'
+      uses: google-github-actions/setup-gcloud@e427ad8a34f8676edf47cf7d7925499adf3eb74f # v2.2.1
 
     - name: 'Use gcloud CLI'
       if: contains(inputs.registry, 'pkg.dev')
