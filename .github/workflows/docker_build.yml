@@ -161,7 +161,7 @@ jobs:
       - build
     steps:
       - name: Push digests
-        uses: FhenixProtocol/actions/.github/actions/push-digests@2.x.x
+        uses: FhenixProtocol/actions/.github/actions/push-digests@f7072f3ec4b0b32d58e8da4614030d4113015a8a # 2.x.x
         with:
           registry: ${{ inputs.registry }}
           image_name: "${{ inputs.image_name }}"
