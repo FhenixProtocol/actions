@@ -31,7 +31,7 @@ runs:
       uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
 
     - name: Log in to container registry.
-      uses: FhenixProtocol/actions/.github/actions/registry-login@2.x.x
+      uses: FhenixProtocol/actions/.github/actions/registry-login@5dcc693028ce32516392d0d7618893b3e1e36919 # 2.x.x
       with:
         service_account_key: ${{ inputs.service_account_key }}
         registry: ${{ inputs.registry }}
