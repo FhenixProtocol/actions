@@ -1,0 +1,46 @@
+name: Setup localcofhe
+description: "Start a full localcofhe stack (cofhe's docker compose: host chain, teecryptor, zee-k-verifier, fheos, ...) on the runner from published images, and wait until it is ready. Runs no tests."
+inputs:
+  token:
+    required: true
+    description: >-
+      GitHub token that reads FhenixProtocol/cofhe (private: its compose files and configs) and
+      ghcr.io/fhenixprotocol packages (internal: the service images). A classic PAT with `repo` and
+      `read:packages`, SSO-authorized for FhenixProtocol.
+  cofhe-ref:
+    required: false
+    default: master
+    description: "cofhe branch, tag or commit whose compose files and teecryptor/zee-k pins to use."
+  images-tag:
+    required: false
+    default: latest
+    description: "Tag of the cofhe service images: latest (nightly master), sha-<commit>, or cofhe-vX.Y.Z."
+outputs:
+  cofhe-path:
+    description: "Where cofhe is checked out. Run `docker compose logs` there to read the service logs."
+    value: .localcofhe/cofhe
+runs:
+  using: "composite"
+  steps:
+    - name: Checkout cofhe
+      uses: actions/checkout@v5
+      with:
+        repository: FhenixProtocol/cofhe
+        ref: ${{ inputs.cofhe-ref }}
+        path: .localcofhe/cofhe
+        token: ${{ inputs.token }}
+        submodules: recursive
+
+    - name: Log in to GHCR
+      uses: docker/login-action@v4
+      with:
+        registry: ghcr.io
+        username: ${{ github.actor }}
+        password: ${{ inputs.token }}
+
+    - name: Start localcofhe
+      shell: bash
+      working-directory: .localcofhe/cofhe
+      env:
+        TAG: ${{ inputs.images-tag }}
+      run: make start-latest-cofhe TAG="$TAG" && make wait-for-cofhe
